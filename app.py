@@ -144,7 +144,7 @@ def create_bell429_map():
     }
 
     # Create a Folium map centered on the Scotsman Hotel
-    m = folium.Map(location=scotsman[1], zoom_start=6, tiles="CartoDB dark_matter")
+    m = folium.Map(location=scotsman[1], zoom_start=6)
 
     # Add a marker for the Scotsman Hotel
     folium.Marker(
