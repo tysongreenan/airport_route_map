@@ -2,8 +2,27 @@ from flask import Flask, render_template, url_for, request
 import folium
 from folium import plugins
 import os
+import math
 
 app = Flask(__name__, static_folder='static')
+
+def haversine_distance(point1, point2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # Convert decimal degrees to radians 
+    lat1, lon1 = point1
+    lat2, lon2 = point2
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula 
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a)) 
+    r = 6371000  # Radius of earth in meters
+    return c * r  # Return distance in meters
 
 def create_challenger_map():
     """Create the Challenger 350 map with long-range destinations"""
@@ -147,7 +166,7 @@ def create_bell429_map():
     # Add markers for all destinations
     for name, coords in destinations.items():
         # Calculate distance from Scotsman Hotel to destination
-        distance = folium.vector_to_raster.get_haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
+        distance = haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
         
         # Set icon and color based on whether destination is within range
         if distance <= 385:
