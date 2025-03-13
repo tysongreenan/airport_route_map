@@ -1,11 +1,12 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 import folium
 from folium import plugins
 import os
 
 app = Flask(__name__, static_folder='static')
 
-def create_map():
+def create_challenger_map():
+    """Create the Challenger 350 map with long-range destinations"""
     # Define the airport data with names and coordinates
     airports = {
         "Los Angeles International Airport (LAX)": (33.9416, -118.4085),
@@ -58,10 +59,142 @@ def create_map():
 
     return m._repr_html_()
 
+def create_bell429_map():
+    """Create the Bell 429 Helicopter map with shorter-range destinations"""
+    # Scotsman Hotel location (Niagara Falls)
+    scotsman = ("The Scotsman Hotel", (43.0962, -79.0377))
+    
+    # Define the helicopter destinations with names and coordinates
+    destinations = {
+        # Ontario Destinations
+        "Toronto Downtown": (43.6532, -79.3832),
+        "Toronto Pearson Airport": (43.6777, -79.6248),
+        "Toronto Billy Bishop Airport": (43.6284, -79.3962),
+        "Muskoka (Cottage Country)": (45.0365, -79.3045),
+        "Ottawa Downtown": (45.4215, -75.6972),
+        "Ottawa International Airport": (45.3223, -75.6674),
+        "Kingston": (44.2312, -76.4860),
+        "London": (42.9849, -81.2453),
+        "Kitchener-Waterloo": (43.4643, -80.5204),
+        "Barrie": (44.3894, -79.6903),
+        "Windsor": (42.3149, -83.0364),
+        "Sudbury": (46.4917, -80.9930),
+        "Sault Ste. Marie": (46.5136, -84.3358),
+        "North Bay": (46.3091, -79.4608),
+        "Thunder Bay": (48.3809, -89.2477),
+        
+        # Quebec Destinations
+        "Montreal Downtown": (45.5017, -73.5673),
+        "Montreal-Trudeau Airport": (45.4698, -73.7411),
+        "Quebec City": (46.8139, -71.2080),
+        "Mont-Tremblant": (46.1185, -74.5962),
+        
+        # New York State Destinations
+        "Buffalo Niagara International Airport": (42.9404, -78.7320),
+        "Rochester": (43.1566, -77.6088),
+        "Syracuse": (43.0481, -76.1474),
+        "Albany": (42.6526, -73.7562),
+        "Lake Placid": (44.2795, -73.9799),
+        "Adirondacks": (44.3894, -74.2168),
+        
+        # Pennsylvania Destinations
+        "Erie": (42.1292, -80.0851),
+        "Pittsburgh": (40.4406, -79.9959),
+        
+        # Michigan Destinations
+        "Detroit Metro Airport": (42.2162, -83.3554),
+        "Detroit Downtown": (42.3314, -83.0458),
+        "Ann Arbor": (42.2808, -83.7430),
+        "Grand Rapids": (42.9634, -85.6681),
+        
+        # Northern U.S. & East Coast Destinations
+        "Cleveland, Ohio": (41.4993, -81.6944),
+        "Columbus, Ohio": (39.9612, -82.9988),
+        "Toledo, Ohio": (41.6528, -83.5379),
+        "Boston, Massachusetts": (42.3601, -71.0589),
+        "Washington D.C.": (38.9072, -77.0369),
+        "New York City (Manhattan)": (40.7128, -74.0060),
+        "JFK Airport": (40.6413, -73.7781),
+        "LaGuardia Airport": (40.7769, -73.8740),
+        "Newark Airport": (40.6895, -74.1745),
+        
+        # Resort & Remote Destinations
+        "Niagara Falls, Ontario": (43.0896, -79.0849),
+        "Blue Mountain Resort": (44.5012, -80.3097),
+        "Algonquin Park": (45.8316, -78.3650)
+    }
+
+    # Create a Folium map centered on the Scotsman Hotel
+    m = folium.Map(location=scotsman[1], zoom_start=6, tiles="CartoDB dark_matter")
+
+    # Add a marker for the Scotsman Hotel
+    folium.Marker(
+        location=scotsman[1],
+        popup=scotsman[0],
+        icon=folium.Icon(color='red', icon='home')
+    ).add_to(m)
+
+    # Draw a circle outlining the 385-nautical-mile range from the Scotsman Hotel
+    radius_m = 385 * 1852  # Convert nautical miles to meters
+    folium.Circle(
+        location=scotsman[1],
+        radius=radius_m,
+        color='#C5A572',
+        fill=False,
+        popup="385 Nautical Mile Range (Bell 429)"
+    ).add_to(m)
+
+    # Add markers for all destinations
+    for name, coords in destinations.items():
+        # Calculate distance from Scotsman Hotel to destination
+        distance = folium.vector_to_raster.get_haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
+        
+        # Set icon and color based on whether destination is within range
+        if distance <= 385:
+            icon_color = 'green'
+            line_color = '#00FF00'
+            within_range = " (In Range)"
+        else:
+            icon_color = 'orange'
+            line_color = '#FFA500'
+            within_range = " (Near Max Range)"
+            
+        folium.Marker(
+            location=coords,
+            popup=f"{name}{within_range} - {distance:.0f} NM",
+            icon=folium.Icon(color=icon_color, icon='helicopter')
+        ).add_to(m)
+        
+        # Draw a line from the Scotsman Hotel to this destination
+        folium.PolyLine(
+            locations=[scotsman[1], coords],
+            color=line_color,
+            weight=2,
+            opacity=0.7,
+            popup=f"{name} - {distance:.0f} NM"
+        ).add_to(m)
+
+    return m._repr_html_()
+
 @app.route('/')
 def index():
-    map_html = create_map()
-    return render_template('index.html', map_html=map_html)
+    # Get the aircraft type from the query parameter, default to challenger
+    aircraft_type = request.args.get('aircraft', 'challenger')
+    
+    if aircraft_type == 'bell429':
+        map_html = create_bell429_map()
+        aircraft_name = "Bell 429 Helicopter"
+        range_text = "385 NM Range"
+    else:
+        map_html = create_challenger_map()
+        aircraft_name = "Challenger 350"
+        range_text = "3,300 NM Range"
+    
+    return render_template('index.html', 
+                          map_html=map_html,
+                          aircraft_type=aircraft_type,
+                          aircraft_name=aircraft_name,
+                          range_text=range_text)
 
 if __name__ == '__main__':
     app.run(debug=True) 
