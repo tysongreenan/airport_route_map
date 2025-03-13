@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, jsonify
 import folium
 from folium import plugins
 import os
 import math
+from config import edge_config
 
 app = Flask(__name__, static_folder='static')
 
@@ -186,6 +187,16 @@ def create_bell429_map():
         ).add_to(m)
 
     return m._repr_html_()
+
+@app.route('/api/branding')
+def get_branding():
+    """API endpoint to fetch branding information from Vercel Edge Config"""
+    branding = edge_config.get_branding()
+    
+    # Add the logo path to the branding info
+    branding["logo_path"] = url_for('static', filename='scotsman-logo.svg')
+    
+    return jsonify(branding)
 
 @app.route('/')
 def index():
