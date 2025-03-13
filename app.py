@@ -147,11 +147,11 @@ def create_bell429_map():
     # Create a Folium map centered on the Scotsman Hotel
     m = folium.Map(location=scotsman[1], zoom_start=6)
 
-    # Add a marker for the Scotsman Hotel
+    # Add a marker for the Scotsman Hotel (destination)
     folium.Marker(
         location=scotsman[1],
         popup=scotsman[0],
-        icon=folium.Icon(color='red', icon='home')
+        icon=folium.Icon(color='red', icon='flag')
     ).add_to(m)
 
     # Draw a circle outlining the 385-nautical-mile range from the Scotsman Hotel
@@ -159,36 +159,27 @@ def create_bell429_map():
     folium.Circle(
         location=scotsman[1],
         radius=radius_m,
-        color='#C5A572',
+        color='orange',
         fill=False,
         popup="385 Nautical Mile Range (Bell 429)"
     ).add_to(m)
 
-    # Add markers for all destinations
+    # Add markers for all origins and draw lines to Scotsman Hotel
     for name, coords in destinations.items():
-        # Calculate distance from Scotsman Hotel to destination
+        # Calculate distance from Scotsman Hotel to origin
         distance = haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
         
-        # Set icon and color based on whether destination is within range
-        if distance <= 385:
-            icon_color = 'green'
-            line_color = '#00FF00'
-            within_range = " (In Range)"
-        else:
-            icon_color = 'orange'
-            line_color = '#FFA500'
-            within_range = " (Near Max Range)"
-            
+        # Add a blue marker for each origin with helicopter icon
         folium.Marker(
             location=coords,
-            popup=f"{name}{within_range} - {distance:.0f} NM",
-            icon=folium.Icon(color=icon_color, icon='helicopter')
+            popup=f"{name} - {distance:.0f} NM",
+            icon=folium.Icon(color='blue', icon='helicopter')
         ).add_to(m)
         
-        # Draw a line from the Scotsman Hotel to this destination
+        # Draw a green line from origin to destination (Scotsman Hotel)
         folium.PolyLine(
-            locations=[scotsman[1], coords],
-            color=line_color,
+            locations=[coords, scotsman[1]],
+            color='green',
             weight=2,
             opacity=0.7,
             popup=f"{name} - {distance:.0f} NM"
