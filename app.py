@@ -170,15 +170,10 @@ def create_bell429_map():
         distance = haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
         
         # Add a blue marker for each origin with helicopter icon
-        helicopter_icon = folium.DivIcon(
-            icon_size=(30, 30),
-            icon_anchor=(15, 15),
-            html='''
-                <div style="background-color:#3186cc; width:24px; height:24px; border-radius:12px; text-align:center; line-height:24px; color:white; font-weight:bold;">
-                    H
-                </div>
-            ''',
-            class_name="helicopter-icon"
+        helicopter_icon = folium.CustomIcon(
+            icon_image=f"{url_for('static', filename='helicopter-48.png')}",
+            icon_size=(24, 24),
+            icon_anchor=(12, 12)
         )
         
         folium.Marker(
@@ -219,4 +214,4 @@ def index():
                           range_text=range_text)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001) 
+    app.run(debug=True) 
