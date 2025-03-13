@@ -100,12 +100,12 @@ def create_bell429_map():
         "Sudbury": (46.4917, -80.9930),
         "Sault Ste. Marie": (46.5136, -84.3358),
         "North Bay": (46.3091, -79.4608),
-        "Thunder Bay": (48.3809, -89.2477),
+        # Thunder Bay removed - approximately 700 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
         
         # Quebec Destinations
         "Montreal Downtown": (45.5017, -73.5673),
         "Montreal-Trudeau Airport": (45.4698, -73.7411),
-        "Quebec City": (46.8139, -71.2080),
+        # Quebec City removed - approximately 450 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
         "Mont-Tremblant": (46.1185, -74.5962),
         
         # New York State Destinations
