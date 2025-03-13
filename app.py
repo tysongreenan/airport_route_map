@@ -173,7 +173,7 @@ def create_bell429_map():
         folium.Marker(
             location=coords,
             popup=f"{name} - {distance:.0f} NM",
-            icon=folium.Icon(color='blue', icon='helicopter')
+            icon=folium.Icon(color='blue', icon='plane')
         ).add_to(m)
         
         # Draw a green line from origin to destination (Scotsman Hotel)
