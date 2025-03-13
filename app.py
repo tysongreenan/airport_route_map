@@ -89,47 +89,47 @@ def create_bell429_map():
         "Toronto Downtown": (43.6532, -79.3832),
         "Toronto Pearson Airport": (43.6777, -79.6248),
         "Toronto Billy Bishop Airport": (43.6284, -79.3962),
-        "Muskoka (Cottage Country)": (45.0365, -79.3045),
+        # Removed Muskoka (Cottage Country) - not a major hub
         "Ottawa Downtown": (45.4215, -75.6972),
         "Ottawa International Airport": (45.3223, -75.6674),
-        "Kingston": (44.2312, -76.4860),
-        "London": (42.9849, -81.2453),
-        "Kitchener-Waterloo": (43.4643, -80.5204),
-        "Barrie": (44.3894, -79.6903),
-        "Windsor": (42.3149, -83.0364),
-        "Sudbury": (46.4917, -80.9930),
-        "Sault Ste. Marie": (46.5136, -84.3358),
-        "North Bay": (46.3091, -79.4608),
+        # Removed Kingston - not a major hub
+        # Removed London - not a major hub
+        # Removed Kitchener-Waterloo - not a major hub
+        # Removed Barrie - not a major hub
+        # Removed Windsor - not a major hub
+        # Removed Sudbury - not a major hub
+        # Removed Sault Ste. Marie - not a major hub
+        # Removed North Bay - not a major hub
         # Thunder Bay removed - approximately 700 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
         
         # Quebec Destinations
         "Montreal Downtown": (45.5017, -73.5673),
         "Montreal-Trudeau Airport": (45.4698, -73.7411),
         # Quebec City removed - approximately 450 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
-        "Mont-Tremblant": (46.1185, -74.5962),
+        # Removed Mont-Tremblant - not a major hub
         
         # New York State Destinations
         "Buffalo Niagara International Airport": (42.9404, -78.7320),
-        "Rochester": (43.1566, -77.6088),
-        "Syracuse": (43.0481, -76.1474),
-        "Albany": (42.6526, -73.7562),
-        "Lake Placid": (44.2795, -73.9799),
-        "Adirondacks": (44.3894, -74.2168),
+        # Removed Rochester - not a major hub
+        # Removed Syracuse - not a major hub
+        # Removed Albany - not a major hub
+        # Removed Lake Placid - not a major hub
+        # Removed Adirondacks - not a major hub
         
         # Pennsylvania Destinations
-        "Erie": (42.1292, -80.0851),
+        # Removed Erie - not a major hub
         "Pittsburgh": (40.4406, -79.9959),
         
         # Michigan Destinations
         "Detroit Metro Airport": (42.2162, -83.3554),
         "Detroit Downtown": (42.3314, -83.0458),
-        "Ann Arbor": (42.2808, -83.7430),
-        "Grand Rapids": (42.9634, -85.6681),
+        # Removed Ann Arbor - not a major hub
+        # Removed Grand Rapids - not a major hub
         
         # Northern U.S. & East Coast Destinations
         "Cleveland, Ohio": (41.4993, -81.6944),
-        "Columbus, Ohio": (39.9612, -82.9988),
-        "Toledo, Ohio": (41.6528, -83.5379),
+        # Removed Columbus, Ohio - not a major hub
+        # Removed Toledo, Ohio - not a major hub
         "Boston, Massachusetts": (42.3601, -71.0589),
         "Washington D.C.": (38.9072, -77.0369),
         "New York City (Manhattan)": (40.7128, -74.0060),
@@ -141,7 +141,7 @@ def create_bell429_map():
         "Niagara Falls, Ontario": (43.0896, -79.0849),
         "Niagara Falls International Airport": (43.0962, -79.0377),
         "Blue Mountain Resort": (44.5012, -80.3097),
-        "Algonquin Park": (45.8316, -78.3650)
+        # Removed Algonquin Park - not a major hub
     }
 
     # Create a Folium map centered on the Scotsman Hotel
