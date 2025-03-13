@@ -170,10 +170,21 @@ def create_bell429_map():
         distance = haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
         
         # Add a blue marker for each origin with helicopter icon
+        helicopter_icon = folium.DivIcon(
+            icon_size=(30, 30),
+            icon_anchor=(15, 15),
+            html='''
+                <div style="background-color:#3186cc; width:24px; height:24px; border-radius:12px; text-align:center; line-height:24px; color:white; font-weight:bold;">
+                    H
+                </div>
+            ''',
+            class_name="helicopter-icon"
+        )
+        
         folium.Marker(
             location=coords,
             popup=f"{name} - {distance:.0f} NM",
-            icon=folium.Icon(color='blue', icon='plane', prefix='fa')
+            icon=helicopter_icon
         ).add_to(m)
         
         # Draw a green line from origin to destination (Scotsman Hotel)
