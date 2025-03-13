@@ -169,11 +169,11 @@ def create_bell429_map():
         # Calculate distance from Scotsman Hotel to origin
         distance = haversine_distance(scotsman[1], coords) / 1852  # Convert meters to nautical miles
         
-        # Add a blue marker for each origin with fighter-jet icon (resembles helicopter)
+        # Add a blue marker for each origin with helicopter icon
         folium.Marker(
             location=coords,
             popup=f"{name} - {distance:.0f} NM",
-            icon=folium.Icon(color='blue', icon='fighter-jet', prefix='fa')
+            icon=folium.Icon(color='blue', icon='helicopter', prefix='fa')
         ).add_to(m)
         
         # Draw a green line from origin to destination (Scotsman Hotel)
