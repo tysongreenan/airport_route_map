@@ -86,11 +86,11 @@ def create_bell429_map():
     # Define the helicopter destinations with names and coordinates
     destinations = {
         # Ontario Destinations
-        "Toronto Downtown": (43.6532, -79.3832),
+        # Removed Toronto Downtown - keeping only airports
         "Toronto Pearson Airport": (43.6777, -79.6248),
         "Toronto Billy Bishop Airport": (43.6284, -79.3962),
         # Removed Muskoka (Cottage Country) - not a major hub
-        "Ottawa Downtown": (45.4215, -75.6972),
+        # Removed Ottawa Downtown - keeping only airports
         "Ottawa International Airport": (45.3223, -75.6674),
         # Removed Kingston - not a major hub
         # Removed London - not a major hub
@@ -103,7 +103,7 @@ def create_bell429_map():
         # Thunder Bay removed - approximately 700 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
         
         # Quebec Destinations
-        "Montreal Downtown": (45.5017, -73.5673),
+        # Removed Montreal Downtown - keeping only airports
         "Montreal-Trudeau Airport": (45.4698, -73.7411),
         # Quebec City removed - approximately 450 NM from Niagara-on-the-Lake, beyond Bell 429's 385 NM range
         # Removed Mont-Tremblant - not a major hub
@@ -118,29 +118,29 @@ def create_bell429_map():
         
         # Pennsylvania Destinations
         # Removed Erie - not a major hub
-        "Pittsburgh": (40.4406, -79.9959),
+        "Pittsburgh International Airport": (40.4921, -80.2329),  # Updated with airport instead of downtown
         
         # Michigan Destinations
         "Detroit Metro Airport": (42.2162, -83.3554),
-        "Detroit Downtown": (42.3314, -83.0458),
+        # Removed Detroit Downtown - keeping only airports
         # Removed Ann Arbor - not a major hub
         # Removed Grand Rapids - not a major hub
         
         # Northern U.S. & East Coast Destinations
-        "Cleveland, Ohio": (41.4993, -81.6944),
+        "Cleveland Hopkins International Airport": (41.4120, -81.8490),  # Updated with airport instead of downtown
         # Removed Columbus, Ohio - not a major hub
         # Removed Toledo, Ohio - not a major hub
-        "Boston, Massachusetts": (42.3601, -71.0589),
-        "Washington D.C.": (38.9072, -77.0369),
-        "New York City (Manhattan)": (40.7128, -74.0060),
+        "Boston Logan International Airport": (42.3656, -71.0096),  # Updated with airport instead of downtown
+        "Washington Dulles International Airport": (38.9531, -77.4565),  # Updated with airport instead of downtown
+        # Removed New York City (Manhattan) - keeping only airports
         "JFK Airport": (40.6413, -73.7781),
         "LaGuardia Airport": (40.7769, -73.8740),
         "Newark Airport": (40.6895, -74.1745),
         
         # Resort & Remote Destinations
-        "Niagara Falls, Ontario": (43.0896, -79.0849),
+        # Removed Niagara Falls, Ontario - keeping only airports
         "Niagara Falls International Airport": (43.0962, -79.0377),
-        "Blue Mountain Resort": (44.5012, -80.3097),
+        "Blue Mountain Resort": (44.5012, -80.3097),  # Kept as exception per request
         # Removed Algonquin Park - not a major hub
     }
 
