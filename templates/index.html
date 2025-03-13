@@ -149,11 +149,11 @@
             
             <div class="legend">
                 <h5>{{ aircraft_name }} Routes</h5>
+                {% if aircraft_type == 'challenger' %}
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: red;"></div>
-                    <span>Scotsman Hotel (Niagara Falls)</span>
+                    <span>Niagara Falls Airport</span>
                 </div>
-                {% if aircraft_type == 'challenger' %}
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: blue;"></div>
                     <span>Origin Airports</span>
@@ -167,6 +167,10 @@
                     <span>{{ range_text }}</span>
                 </div>
                 {% else %}
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: red;"></div>
+                    <span>The Scotsman Hotel (Niagara-on-the-Lake)</span>
+                </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: green;"></div>
                     <span>Destinations (In Range)</span>

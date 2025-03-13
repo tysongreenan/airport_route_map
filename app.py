@@ -80,8 +80,8 @@ def create_challenger_map():
 
 def create_bell429_map():
     """Create the Bell 429 Helicopter map with shorter-range destinations"""
-    # Scotsman Hotel location (Niagara Falls)
-    scotsman = ("The Scotsman Hotel", (43.0962, -79.0377))
+    # The Scotsman Hotel location in Niagara-on-the-Lake
+    scotsman = ("The Scotsman Hotel, 95 Johnson St, Niagara-on-the-Lake", (43.2553, -79.0713))
     
     # Define the helicopter destinations with names and coordinates
     destinations = {
@@ -139,6 +139,7 @@ def create_bell429_map():
         
         # Resort & Remote Destinations
         "Niagara Falls, Ontario": (43.0896, -79.0849),
+        "Niagara Falls International Airport": (43.0962, -79.0377),
         "Blue Mountain Resort": (44.5012, -80.3097),
         "Algonquin Park": (45.8316, -78.3650)
     }
