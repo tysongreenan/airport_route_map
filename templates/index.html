@@ -215,14 +215,6 @@
                 // Apply primary color to elements with the primary color
                 if (branding.primary_color) {
                     document.documentElement.style.setProperty('--primary-color', branding.primary_color);
-                    
-                    // Update CSS for elements that use the primary color
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        .header p, .legend h5, .nav-tabs .nav-link { color: ${branding.primary_color} !important; }
-                        .header, .map-container, .legend, .nav-tabs { border-color: ${branding.primary_color} !important; }
-                    `;
-                    document.head.appendChild(style);
                 }
                 
                 // Apply secondary color if provided
@@ -231,10 +223,31 @@
                 }
                 
                 // Update logo if provided
-                if (branding.logo_path) {
+                if (branding.logo_url) {
                     const logoImg = document.querySelector('.logo');
                     if (logoImg) {
-                        logoImg.src = branding.logo_path;
+                        logoImg.src = branding.logo_url;
+                    }
+                }
+                
+                // Update favicon if provided
+                if (branding.favicon_url) {
+                    let favicon = document.querySelector('link[rel="icon"]');
+                    if (!favicon) {
+                        favicon = document.createElement('link');
+                        favicon.rel = 'icon';
+                        document.head.appendChild(favicon);
+                    }
+                    favicon.href = branding.favicon_url;
+                }
+                
+                // Update header background if provided
+                if (branding.header_image_url) {
+                    const header = document.querySelector('.header');
+                    if (header) {
+                        header.style.backgroundImage = `url(${branding.header_image_url})`;
+                        header.style.backgroundSize = 'cover';
+                        header.style.backgroundPosition = 'center';
                     }
                 }
             } catch (error) {

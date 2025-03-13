@@ -193,10 +193,39 @@ def get_branding():
     """API endpoint to fetch branding information from Vercel Edge Config"""
     branding = edge_config.get_branding()
     
-    # Add the logo path to the branding info
-    branding["logo_path"] = url_for('static', filename='scotsman-logo.svg')
+    # Add local file paths as fallbacks if Edge Config doesn't have URLs
+    if not branding.get("logo_url"):
+        branding["logo_url"] = url_for('static', filename='scotsman-logo.svg')
+    
+    if not branding.get("favicon_url"):
+        branding["favicon_url"] = url_for('static', filename='favicon.ico')
+    
+    if not branding.get("header_image_url"):
+        branding["header_image_url"] = url_for('static', filename='header-bg.jpg')
     
     return jsonify(branding)
+
+@app.route('/api/media', methods=['POST'])
+def update_media():
+    """API endpoint to update media assets in Edge Config"""
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 400
+    
+    data = request.json
+    if not data.get("asset_key") or not data.get("asset_url"):
+        return jsonify({"error": "Missing asset_key or asset_url"}), 400
+    
+    success = edge_config.update_media_asset(data["asset_key"], data["asset_url"])
+    
+    if success:
+        return jsonify({"success": True, "message": f"Updated {data['asset_key']}"})
+    else:
+        return jsonify({"success": False, "message": "Failed to update asset"}), 500
+
+@app.route('/admin')
+def admin():
+    """Admin page for managing media assets"""
+    return render_template('admin.html')
 
 @app.route('/')
 def index():

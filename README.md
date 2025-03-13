@@ -90,6 +90,9 @@ To use Vercel Edge Config for storing your branding information:
    - `tagline`: Your tagline
    - `primary_color`: Your primary brand color (hex code)
    - `secondary_color`: Your secondary brand color (hex code)
+   - `logo_url`: URL to your logo image
+   - `favicon_url`: URL to your favicon
+   - `header_image_url`: URL to your header background image
 
 3. Set up environment variables in your Vercel project:
    - `EDGE_CONFIG_TOKEN`: Your Edge Config token
@@ -102,6 +105,25 @@ To use Vercel Edge Config for storing your branding information:
    ```
 
 5. The application will automatically use your Edge Config values when deployed
+
+## Managing Media Assets
+
+This application includes a simple admin interface for managing media assets:
+
+1. Access the admin interface at `/admin`
+2. From there, you can update:
+   - Logo URL
+   - Favicon URL
+   - Header background image URL
+
+3. The URLs should point to publicly accessible images (e.g., stored in a CDN, S3 bucket, or other hosting service)
+
+4. Changes made through the admin interface are stored in Vercel Edge Config and will be immediately reflected on the site
+
+5. If you're not using Edge Config, you can still customize the site by:
+   - Placing your logo in `static/scotsman-logo.svg`
+   - Placing your favicon in `static/favicon.ico`
+   - Placing your header background in `static/header-bg.jpg`
 
 ## License
 
