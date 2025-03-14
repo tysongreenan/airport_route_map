@@ -47,7 +47,7 @@ def create_challenger_map():
     niagara = ("Niagara Falls International Airport (IAG)", (43.0962, -79.0377))
 
     # Create a Folium map centered on Niagara Falls International Airport
-    m = folium.Map(location=niagara[1], zoom_start=5)
+    m = folium.Map(location=niagara[1], zoom_start=5, width='100%', height='100%', control_scale=True)
 
     # Add a marker for Niagara Falls International Airport
     folium.Marker(
@@ -145,7 +145,7 @@ def create_bell429_map():
     }
 
     # Create a Folium map centered on the Scotsman Hotel
-    m = folium.Map(location=scotsman[1], zoom_start=6)
+    m = folium.Map(location=scotsman[1], zoom_start=6, width='100%', height='100%', control_scale=True)
 
     # Add a marker for the Scotsman Hotel (destination)
     folium.Marker(
