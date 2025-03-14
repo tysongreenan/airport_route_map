@@ -51,6 +51,11 @@
                     legendToggle.innerHTML = '🔍';
                     legendToggle.classList.remove('bg-red-600');
                     legendToggle.classList.add('bg-scotsman-gold');
+                    legendToggle.classList.remove('hidden');
+                } else if (legendToggle) {
+                    // On desktop, show content and hide toggle
+                    if (legendContent) legendContent.classList.remove('hidden');
+                    legendToggle.classList.add('hidden');
                 }
             }
             
@@ -67,10 +72,17 @@
         
         /* Custom styles that can't be handled by Tailwind */
         .map-container {
-            height: calc(100vh - 220px);
-            min-height: 400px;
+            height: 65vh;
+            min-height: 450px;
+            max-height: 650px;
             display: flex;
             flex-direction: column;
+            margin: 1.5rem 0;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            width: 100%;
         }
         
         /* Fix for Folium map container to fill available space */
@@ -78,6 +90,12 @@
             flex: 1;
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0;
         }
         
         /* Fix for Folium iframe */
@@ -86,6 +104,7 @@
             height: 100% !important;
             display: block;
             border: none;
+            position: absolute;
         }
         
         /* Remove any default margins or padding */
@@ -94,22 +113,62 @@
             padding: 0 !important;
         }
         
+        /* Legend styles */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border: 2px solid #C5A572;
+            color: white;
+            max-width: 300px;
+        }
+        
+        /* Fix for mobile horizontal scrolling */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+        
+        /* Ensure grid items don't cause overflow */
+        .grid {
+            width: 100%;
+        }
+        
         @media (max-width: 640px) {
             .map-container {
-                height: calc(100vh - 180px);
+                height: auto;
+                aspect-ratio: 1.2/1;
+                min-height: 250px;
+                max-height: 400px;
+                margin: 0.75rem 0;
+                border-radius: 6px;
             }
+            
+            /* Ensure the map fills the container properly */
+            .map-container .folium-map,
+            .map-container .folium-map iframe {
+                height: 100% !important;
+                width: 100% !important;
+            }
+            
             .legend {
-                max-width: 80% !important;
+                max-width: 75% !important;
                 right: 10px !important;
                 bottom: 10px !important;
                 font-size: 0.8rem !important;
-                background-color: rgba(0, 0, 0, 0.85) !important;
+                padding: 10px !important;
+                border-radius: 6px !important;
             }
             .legend h5 {
                 font-size: 1rem !important;
             }
             .legend-toggle {
-                position: fixed;
+                position: absolute;
                 bottom: 10px;
                 right: 10px;
                 width: 40px;
@@ -122,18 +181,35 @@
                 cursor: pointer;
                 z-index: 1001;
                 border: 2px solid white;
+                background-color: #C5A572;
+                color: white;
+            }
+            
+            /* Only hide content on mobile */
+            .mobile-hidden {
+                display: none;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Adjust padding for mobile */
+            .px-4 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
             }
         }
     </style>
 </head>
-<body class="font-optima bg-dark-bg text-white m-0 p-0">
+<body class="font-optima bg-dark-bg text-white m-0 p-0 overflow-x-hidden">
     <div class="bg-black bg-opacity-90 text-white p-4 md:p-8 text-center border-b border-scotsman-gold">
         <img src="{{ url_for('static', filename='TSH_Logos_Main_White_RGB.png') }}" alt="The Scotsman Hotel Logo" class="max-w-[180px] md:max-w-[200px] mx-auto mb-4 md:mb-6 transition-opacity duration-300 hover:opacity-80">
         <h1 class="font-aviano font-bold text-xl md:text-2xl text-white mb-1 md:mb-2 tracking-wider uppercase">THE SCOTSMAN HOTEL</h1>
         <p class="font-aviano text-scotsman-gold text-sm md:text-lg tracking-wide">Luxury Travel Options to Niagara Falls</p>
     </div>
     
-    <div class="max-w-7xl mx-auto px-4 md:px-8">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 overflow-hidden">
         <ul class="flex border-b border-scotsman-gold mb-4 mt-4 overflow-x-auto">
             <li class="mr-1">
                 <a class="inline-block px-4 py-2 md:px-8 md:py-3 font-aviano text-scotsman-gold hover:text-white hover:border-scotsman-gold transition-all duration-300 text-sm md:text-base tracking-wide {{ 'text-white bg-scotsman-gold bg-opacity-10 border-scotsman-gold border-b-2' if aircraft_type == 'challenger' else '' }}" href="?aircraft=challenger">
@@ -147,53 +223,368 @@
             </li>
         </ul>
 
-        <div class="map-container relative border border-scotsman-gold rounded-md overflow-hidden mb-4 flex flex-col">
+        <div class="map-container relative border border-scotsman-gold rounded-md overflow-hidden flex flex-col">
             <div class="folium-map w-full h-full flex-1">
                 {{ map_html | safe }}
             </div>
             
-            <div class="legend fixed bottom-[30px] right-[30px] bg-black bg-opacity-90 p-4 rounded-md shadow-lg z-[1000] border-2 border-scotsman-gold text-white max-w-[300px] min-w-[250px]">
-                <div id="legend-content">
-                    <h5 class="text-scotsman-gold font-aviano mb-4 text-lg tracking-wide uppercase text-center border-b border-scotsman-gold pb-2">{{ aircraft_name }} Routes</h5>
+            <!-- Desktop Legend - Always visible on larger screens -->
+            <div class="legend hidden sm:block max-w-[300px] min-w-[250px]">
+                <h5 class="text-scotsman-gold font-aviano mb-3 text-lg tracking-wide uppercase text-center border-b border-scotsman-gold pb-2">{{ aircraft_name }} Routes</h5>
+                {% if aircraft_type == 'challenger' %}
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
+                    <span>Niagara Falls Airport</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+                    <span>Origin Airports</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
+                    <span>Flight Routes</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                    <span>{{ range_text }}</span>
+                </div>
+                {% else %}
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
+                    <span>The Scotsman Hotel (Niagara-on-the-Lake)</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+                    <span>Destinations</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
+                    <span>Flight Routes</span>
+                </div>
+                <div class="flex items-center my-2">
+                    <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                    <span>{{ range_text }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Mobile Legend with Toggle Button -->
+            <div class="block sm:hidden">
+                <!-- Mobile Toggle Button -->
+                <button onclick="toggleMobileLegend()" class="legend-toggle">🔍</button>
+                
+                <!-- Mobile Legend Content (hidden by default) -->
+                <div id="mobile-legend" class="legend mobile-hidden max-w-[80%] right-[10px] bottom-[10px]">
+                    <div class="flex justify-between items-center mb-2">
+                        <h5 class="text-scotsman-gold font-aviano text-base tracking-wide uppercase">{{ aircraft_name }} Routes</h5>
+                        <button onclick="toggleMobileLegend()" class="text-white text-lg">&times;</button>
+                    </div>
+                    <div class="border-b border-scotsman-gold mb-3"></div>
                     {% if aircraft_type == 'challenger' %}
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
-                        <span>Niagara Falls Airport</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-red-600 flex-shrink-0"></div>
+                        <span class="text-sm">Niagara Falls Airport</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
-                        <span>Origin Airports</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <span class="text-sm">Origin Airports</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
-                        <span>Flight Routes</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-green-600 flex-shrink-0"></div>
+                        <span class="text-sm">Flight Routes</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
-                        <span>{{ range_text }}</span>
+                        <div class="w-4 h-4 mr-3 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                        <span class="text-sm">{{ range_text }}</span>
                     </div>
                     {% else %}
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
-                        <span>The Scotsman Hotel (Niagara-on-the-Lake)</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-red-600 flex-shrink-0"></div>
+                        <span class="text-sm">The Scotsman Hotel</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
-                        <span>Destinations</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <span class="text-sm">Destinations</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
-                        <span>Flight Routes</span>
+                        <div class="w-4 h-4 mr-3 rounded-full bg-green-600 flex-shrink-0"></div>
+                        <span class="text-sm">Flight Routes</span>
                     </div>
                     <div class="flex items-center my-2">
-                        <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
-                        <span>{{ range_text }}</span>
+                        <div class="w-4 h-4 mr-3 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                        <span class="text-sm">{{ range_text }}</span>
                     </div>
                     {% endif %}
                 </div>
-                <button id="legend-toggle" class="legend-toggle bg-scotsman-gold hidden md:hidden">🔍</button>
             </div>
         </div>
     </div>
+    
+    <!-- Aircraft Information Sections -->
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-16 mt-8 overflow-hidden">
+        <!-- Challenger 350 Information Section -->
+        <div class="{% if aircraft_type == 'challenger' %}block{% else %}hidden{% endif %}">
+            <div class="my-6 border-b-2 border-scotsman-gold pb-2">
+                <h2 class="font-aviano text-2xl md:text-3xl text-white">Challenger 350</h2>
+                <p class="text-scotsman-gold italic">Experience unmatched luxury and performance</p>
+            </div>
+            
+            <!-- Key Specifications -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">9</div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Passengers</div>
+                </div>
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">3,300<span class="text-lg align-top ml-1">NM</span></div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Range</div>
+                </div>
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">445<span class="text-lg align-top ml-1">KTAS</span></div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Cruise Speed</div>
+                </div>
+            </div>
+            
+            <!-- Aircraft Description -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 border-b border-scotsman-gold pb-2">Unmatched Versatility</h3>
+                    <p class="mb-4">Experience the unmatched versatility of the Challenger 350, an aircraft that goes beyond business travel. With ample space for up to 9 passengers and a range of 3,300 miles, it excels on short, medium, and long-haul flights.</p>
+                    <p>Our interior boasts lavish finishes that guarantee a premium travel experience. Designed for seamless journeys, from takeoff to landing, our Challenger 350 and crew promise a luxurious and smooth flight.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4 border-b border-scotsman-gold pb-2">Gourmet Catering & Amenities</h3>
+                    <p class="mb-4">Indulge in an exquisite culinary experience with gourmet catering and savor a selection of premium beverages from our fully stocked bar.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>HD Entertainment System</li>
+                        <li>Wi-Fi Connectivity</li>
+                        <li>Satellite Phone</li>
+                        <li>Full Service Forward Galley/Bar</li>
+                        <li>Cabin Temperature Control</li>
+                        <li>18" Monitors</li>
+                        <li>Private Lavatory</li>
+                        <li>Espresso Machine</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Cabin Information -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold mb-4 border-b border-scotsman-gold pb-2">Luxurious Cabin</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-black bg-opacity-50 p-4 border border-scotsman-gold rounded-md text-center">
+                        <div class="text-3xl font-bold mb-1">6.1<span class="text-sm align-top ml-1">FT</span></div>
+                        <div class="text-scotsman-gold uppercase tracking-wider text-xs">Cabin Height</div>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-4 border border-scotsman-gold rounded-md text-center">
+                        <div class="text-3xl font-bold mb-1">106<span class="text-sm align-top ml-1">FT³</span></div>
+                        <div class="text-scotsman-gold uppercase tracking-wider text-xs">Baggage Capacity</div>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-4 border border-scotsman-gold rounded-md text-center">
+                        <div class="text-3xl font-bold mb-1">860<span class="text-sm align-top ml-1">FT³</span></div>
+                        <div class="text-scotsman-gold uppercase tracking-wider text-xs">Cabin Volume</div>
+                    </div>
+                </div>
+                <p>It's the top choice for those who demand a blend of efficiency and opulence, elevating your travel to new heights.</p>
+            </div>
+        </div>
+        
+        <!-- Bell 429 Helicopter Information Section -->
+        <div class="{% if aircraft_type == 'bell429' %}block{% else %}hidden{% endif %}">
+            <div class="my-6 border-b-2 border-scotsman-gold pb-2">
+                <h2 class="font-aviano text-2xl md:text-3xl text-white">Bell 429 Helicopter</h2>
+                <p class="text-scotsman-gold italic">Embark on luxury travel beyond boundaries</p>
+            </div>
+            
+            <!-- Key Specifications -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">1-6<span class="text-lg align-top ml-1">PAX</span></div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Capacity</div>
+                </div>
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">140<span class="text-lg align-top ml-1">KTS</span></div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Speed</div>
+                </div>
+                <div class="bg-black bg-opacity-50 p-6 border border-scotsman-gold rounded-md text-center">
+                    <div class="text-5xl font-bold mb-2">385<span class="text-lg align-top ml-1">NM</span></div>
+                    <div class="text-scotsman-gold uppercase tracking-wider text-sm">Range</div>
+                </div>
+            </div>
+            
+            <!-- Helicopter Description -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold mb-4 border-b border-scotsman-gold pb-2">Your Exclusive Charter Experience</h3>
+                <p class="mb-6">Effortlessly stylish, smooth and swift, the Bell 429 embodies luxury, elevated. Fly like you've never flown before in an aircraft designed for your comfort and built to captivate the world.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-scotsman-gold">Exceptional Safety</h4>
+                        <ul class="list-disc pl-5 space-y-2 mb-6">
+                            <li>Full crew, two qualified pilots in cockpit</li>
+                            <li>Twin engine functionality for improved reliability, redundancy and performance</li>
+                            <li>Equipped with advanced avionics and technology including weather radar, traffic and terrain advisory</li>
+                        </ul>
+                        
+                        <h4 class="text-lg font-semibold mb-3 text-scotsman-gold">Save Travel Time</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Auxiliary fuel tank for greater range</li>
+                            <li>Flexible landing surface capability</li>
+                            <li>Efficient start/stop procedures</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-scotsman-gold">Seating Options</h4>
+                        <p class="mb-3">Choose from two luxurious configurations:</p>
+                        <ul class="list-disc pl-5 space-y-2 mb-6">
+                            <li><span class="font-bold">4-Seater</span> with Captain's Chairs - Ultimate comfort for executive travel</li>
+                            <li><span class="font-bold">6-Seater</span> - Perfect for larger groups and families</li>
+                        </ul>
+                        
+                        <h4 class="text-lg font-semibold mb-3 text-scotsman-gold">Fly Comfortably</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Climate controlled cabin</li>
+                            <li>Noise-cancelling headsets</li>
+                            <li>Exceptional visibility with large windows</li>
+                            <li>Smooth flight characteristics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Experience Types -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 border-b border-scotsman-gold pb-2">Discover the Myriad of Ways to Journey by Helicopter</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Golf and Vacation Trips</h4>
+                        <p>Access exclusive golf courses and vacation destinations unavailable by standard transportation.</p>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Airport/Jet Transfer</h4>
+                        <p>Seamless connections to Pearson, Billy Bishop, Niagara, and Buffalo airports.</p>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Downtown Toronto Skyline Tours</h4>
+                        <p>Experience breathtaking views of Toronto's iconic skyline from a unique perspective.</p>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Industrial & Mining Access</h4>
+                        <p>Direct transportation to remote industrial sites, mines, and quarries.</p>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Remote Fishing Locations</h4>
+                        <p>Access pristine and exclusive fishing spots unreachable by conventional means.</p>
+                    </div>
+                    <div class="bg-black bg-opacity-50 p-5 border border-scotsman-gold rounded-md">
+                        <h4 class="font-bold mb-2 text-scotsman-gold">Muskoka Cottage Travel</h4>
+                        <p>Skip the traffic and arrive at your cottage in style and comfort.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer with Contact Information -->
+    <footer class="bg-black bg-opacity-90 border-t border-scotsman-gold py-8 mt-8 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Logo and Tagline -->
+                <div class="text-center md:text-left md:border-r border-scotsman-gold pr-0 md:pr-8">
+                    <img src="{{ url_for('static', filename='TSH_Logos_Main_White_RGB.png') }}" alt="The Scotsman Hotel Logo" class="max-w-[150px] mx-auto md:mx-0 mb-4">
+                    <p class="text-sm text-scotsman-gold italic">Elevating luxury travel from Niagara-on-the-Lake</p>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="text-center md:text-left md:border-r border-scotsman-gold pr-0 md:pr-8">
+                    <h3 class="text-scotsman-gold font-aviano text-lg mb-4">Contact Us</h3>
+                    <address class="not-italic text-sm">
+                        <p class="mb-2">The Scotsman Hotel</p>
+                        <p class="mb-2">95 Johnson St, Niagara-on-the-Lake</p>
+                        <p class="mb-2">Ontario, Canada L0S 1J0</p>
+                        <p class="mb-4">1-800-555-LUXE</p>
+                        <p><a href="mailto:charter@scotsmanhotel.com" class="text-scotsman-gold hover:text-white transition-colors">charter@scotsmanhotel.com</a></p>
+                    </address>
+                </div>
+                
+                <!-- Call to Action -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-scotsman-gold font-aviano text-lg mb-4">Reserve Your Experience</h3>
+                    <p class="mb-4 text-sm">Ready to elevate your travel? Contact our concierge to book your private flight experience.</p>
+                    <a href="#" class="inline-block bg-scotsman-gold text-black font-bold py-2 px-6 rounded hover:bg-white transition-colors">Book Now</a>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-scotsman-gold text-center text-xs text-gray-400">
+                <p>&copy; {{ current_year if current_year else '2023' }} The Scotsman Hotel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function toggleMobileLegend() {
+            const legend = document.getElementById('mobile-legend');
+            if (legend.classList.contains('mobile-hidden')) {
+                legend.classList.remove('mobile-hidden');
+            } else {
+                legend.classList.add('mobile-hidden');
+            }
+        }
+        
+        // Improved map container sizing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to adjust map container based on content and screen size
+            function adjustMapContainer() {
+                const mapContainer = document.querySelector('.map-container');
+                const mapIframe = document.querySelector('.folium-map iframe');
+                
+                if (mapContainer && mapIframe) {
+                    // Set timeout to ensure map is loaded
+                    setTimeout(() => {
+                        if (window.innerWidth <= 640) {
+                            // Mobile view - more compact
+                            mapContainer.style.height = 'auto';
+                            // Use a more compact aspect ratio for iPhone
+                            mapContainer.style.aspectRatio = '1.2/1';
+                            mapContainer.style.maxHeight = '400px';
+                        } else if (window.innerWidth <= 1024) {
+                            // Tablet view
+                            mapContainer.style.height = '60vh';
+                            mapContainer.style.minHeight = '400px';
+                        } else {
+                            // Desktop view
+                            mapContainer.style.height = '65vh';
+                            mapContainer.style.minHeight = '450px';
+                        }
+                        
+                        // Ensure the iframe fills the container
+                        if (mapIframe) {
+                            mapIframe.style.width = '100%';
+                            mapIframe.style.height = '100%';
+                        }
+                    }, 300);
+                }
+            }
+            
+            // Run on load and resize
+            adjustMapContainer();
+            window.addEventListener('resize', adjustMapContainer);
+            
+            // Also run after a delay to ensure map is fully loaded
+            setTimeout(adjustMapContainer, 1000);
+            
+            // Additional check specifically for iPhone-sized devices
+            if (/iPhone/.test(navigator.userAgent) || window.innerWidth >= 375 && window.innerWidth <= 430) {
+                setTimeout(() => {
+                    const mapContainer = document.querySelector('.map-container');
+                    if (mapContainer) {
+                        mapContainer.style.aspectRatio = '1.2/1';
+                        mapContainer.style.maxHeight = '350px';
+                    }
+                }, 1500);
+            }
+        });
+    </script>
 </body>
 </html> 

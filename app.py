@@ -3,6 +3,7 @@ import folium
 from folium import plugins
 import os
 import math
+import datetime
 
 app = Flask(__name__, static_folder='static')
 
@@ -212,11 +213,15 @@ def index():
         aircraft_name = "Challenger 350"
         range_text = "3,300 NM Range"
     
+    # Get current year for copyright
+    current_year = datetime.datetime.now().year
+    
     return render_template('index.html', 
                           map_html=map_html,
                           aircraft_type=aircraft_type,
                           aircraft_name=aircraft_name,
-                          range_text=range_text)
+                          range_text=range_text,
+                          current_year=current_year)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001) 
