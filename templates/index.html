@@ -22,6 +22,42 @@
                 }
             }
         }
+        
+        // Add function to toggle legend visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const legendToggle = document.getElementById('legend-toggle');
+            const legendContent = document.getElementById('legend-content');
+            
+            if (legendToggle && legendContent) {
+                legendToggle.addEventListener('click', function() {
+                    if (legendContent.classList.contains('hidden')) {
+                        legendContent.classList.remove('hidden');
+                        legendToggle.innerHTML = '✕';
+                        legendToggle.classList.add('bg-red-600');
+                        legendToggle.classList.remove('bg-scotsman-gold');
+                    } else {
+                        legendContent.classList.add('hidden');
+                        legendToggle.innerHTML = '🔍';
+                        legendToggle.classList.remove('bg-red-600');
+                        legendToggle.classList.add('bg-scotsman-gold');
+                    }
+                });
+            }
+            
+            // Check if mobile and collapse by default
+            function checkMobile() {
+                if (window.innerWidth < 768 && legendContent && legendToggle) {
+                    legendContent.classList.add('hidden');
+                    legendToggle.innerHTML = '🔍';
+                    legendToggle.classList.remove('bg-red-600');
+                    legendToggle.classList.add('bg-scotsman-gold');
+                }
+            }
+            
+            // Run on load and resize
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+        });
     </script>
     <style>
         @font-face {
@@ -67,9 +103,25 @@
                 right: 10px !important;
                 bottom: 10px !important;
                 font-size: 0.8rem !important;
+                background-color: rgba(0, 0, 0, 0.85) !important;
             }
             .legend h5 {
                 font-size: 1rem !important;
+            }
+            .legend-toggle {
+                position: fixed;
+                bottom: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                cursor: pointer;
+                z-index: 1001;
+                border: 2px solid white;
             }
         }
     </style>
@@ -101,42 +153,45 @@
             </div>
             
             <div class="legend fixed bottom-[30px] right-[30px] bg-black bg-opacity-90 p-4 rounded-md shadow-lg z-[1000] border-2 border-scotsman-gold text-white max-w-[300px] min-w-[250px]">
-                <h5 class="text-scotsman-gold font-aviano mb-4 text-lg tracking-wide uppercase text-center border-b border-scotsman-gold pb-2">{{ aircraft_name }} Routes</h5>
-                {% if aircraft_type == 'challenger' %}
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
-                    <span>Niagara Falls Airport</span>
+                <div id="legend-content">
+                    <h5 class="text-scotsman-gold font-aviano mb-4 text-lg tracking-wide uppercase text-center border-b border-scotsman-gold pb-2">{{ aircraft_name }} Routes</h5>
+                    {% if aircraft_type == 'challenger' %}
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
+                        <span>Niagara Falls Airport</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <span>Origin Airports</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
+                        <span>Flight Routes</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                        <span>{{ range_text }}</span>
+                    </div>
+                    {% else %}
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
+                        <span>The Scotsman Hotel (Niagara-on-the-Lake)</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <span>Destinations</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
+                        <span>Flight Routes</span>
+                    </div>
+                    <div class="flex items-center my-2">
+                        <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
+                        <span>{{ range_text }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
-                    <span>Origin Airports</span>
-                </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
-                    <span>Flight Routes</span>
-                </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
-                    <span>{{ range_text }}</span>
-                </div>
-                {% else %}
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-red-600 flex-shrink-0"></div>
-                    <span>The Scotsman Hotel (Niagara-on-the-Lake)</span>
-                </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-blue-600 flex-shrink-0"></div>
-                    <span>Destinations</span>
-                </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full bg-green-600 flex-shrink-0"></div>
-                    <span>Flight Routes</span>
-                </div>
-                <div class="flex items-center my-2">
-                    <div class="w-5 h-5 mr-4 rounded-full border-2 border-orange-500 flex-shrink-0"></div>
-                    <span>{{ range_text }}</span>
-                </div>
-                {% endif %}
+                <button id="legend-toggle" class="legend-toggle bg-scotsman-gold hidden md:hidden">🔍</button>
             </div>
         </div>
     </div>
