@@ -42,6 +42,10 @@ def create_challenger_map():
         "Philadelphia International Airport (PHL)": (39.8744, -75.2424),
         "Newark Liberty International Airport (EWR)": (40.6895, -74.1745),
         "John F. Kennedy International Airport (JFK)": (40.6413, -73.7781),
+        # Adding Canadian destinations
+        "Montréal-Pierre Elliott Trudeau International Airport (YUL)": (45.4698, -73.7411),
+        "Calgary International Airport (YYC)": (51.1215, -114.0076),
+        "Vancouver International Airport (YVR)": (49.1967, -123.1815),
     }
 
     # Niagara Falls International Airport (IAG)
@@ -134,9 +138,9 @@ def create_bell429_map():
         "Boston Logan International Airport": (42.3656, -71.0096),  # Updated with airport instead of downtown
         "Washington Dulles International Airport": (38.9531, -77.4565),  # Updated with airport instead of downtown
         # Removed New York City (Manhattan) - keeping only airports
-        "JFK Airport": (40.6413, -73.7781),
+        # Keeping only LaGuardia Airport for New York
         "LaGuardia Airport": (40.7769, -73.8740),
-        "Newark Airport": (40.6895, -74.1745),
+        # Removed JFK and Newark airports
         
         # Resort & Remote Destinations
         # Removed Niagara Falls, Ontario - keeping only airports
